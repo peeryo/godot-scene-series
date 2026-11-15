@@ -69,7 +69,7 @@
     {
       "id": "enemies",
       "title": "Enemies",
-      "blurb": "Things that move on their own, patrol, chase, and hurt the player.",
+      "blurb": "Enemies that patrol and chase on their own, and hazards that cost the player a heart.",
       "theme": {
         "dark": {
           "--bg": "#1B2433",
@@ -94,7 +94,20 @@
           "--accent-ink": "#FFFFFF"
         }
       },
-      "downloads": []
+      "downloads": [
+        {
+          "label": "Enemies starter project",
+          "file": "downloads/godot-enemies-starter.zip",
+          "kind": "Godot 4.6",
+          "note": "The player is finished. Build the slime, the spikes and hurtbox, and the chase."
+        },
+        {
+          "label": "Art pack",
+          "file": "downloads/godot-scene-series-art.zip",
+          "kind": "PNG files",
+          "note": "Every sprite and tile as a 16 x 16 PNG, for drawing your own replacements."
+        }
+      ]
     },
     {
       "id": "tilemaps",
@@ -166,7 +179,8 @@
         "P5",
         "P1",
         "P3",
-        "P4"
+        "P4",
+        "E1"
       ]
     },
     {
@@ -182,11 +196,13 @@
     {
       "id": "items-handle-themselves",
       "title": "Items handle themselves",
-      "text": "A coin is its own scene with its own Area2D. It notices the player with body_entered and removes itself with queue_free(). Give the player its own Area2D only for the exceptions: a magnet radius, an interaction range, or a hurtbox.",
+      "text": "A coin is its own scene with its own Area2D. It notices the player with body_entered and removes itself with queue_free(). Give the player its own Area2D only for the exceptions: a magnet radius, an interaction range, a hurtbox, or an enemy\u2019s detection circle.",
       "episodes": [
         "K1",
         "K3",
-        "P2"
+        "P2",
+        "E2",
+        "E3"
       ]
     },
     {
@@ -195,6 +211,14 @@
       "text": "When one scene needs another to do something, it calls a function on it, like the heart calling heal(). When a scene has news and doesn\u2019t care who hears it, it emits a signal, like the player\u2019s health_changed. Whoever cares, like the HUD, connects to it. Each scene only knows its own job.",
       "episodes": [
         "K2"
+      ]
+    },
+    {
+      "id": "layers-and-masks",
+      "title": "Layers say who notices whom",
+      "text": "Every physics node sits on collision layers and watches collision masks. Put hazards on their own layer, and give the hurtbox a mask that watches only that layer. It then ignores walls, coins and everything else.",
+      "episodes": [
+        "E2"
       ]
     },
     {
@@ -442,8 +466,7 @@
       "id": "E1",
       "topic": "enemies",
       "title": "A patrolling slime",
-      "planned": true,
-      "summary": "A CharacterBody2D enemy that walks back and forth and turns around at ledges with a RayCast2D.",
+      "summary": "An enemy is a CharacterBody2D too. It walks with move_and_slide(), turns at walls with is_on_wall(), and turns at ledges with a RayCast2D.",
       "tree": [
         {
           "name": "Slime",
@@ -463,19 +486,28 @@
           "depth": 1
         }
       ],
-      "bigIdea": "pick-the-body"
+      "bigIdea": "pick-the-body",
+      "video": "videos/e1-patrolling-slime.mp4",
+      "code": "if is_on_wall():\n    dir = -dir\nif not ray.is_colliding():\n    dir = -dir\nray.position.x = 12.0 * dir"
     },
     {
       "id": "E2",
       "topic": "enemies",
-      "title": "Hitboxes and hurtboxes",
-      "planned": true,
-      "summary": "Two Area2Ds that find each other, kept apart from walls with collision layers and masks.",
+      "title": "Danger zones and hurtboxes",
+      "summary": "Spikes are an Area2D on collision layer 3. The player\u2019s Hurtbox Area2D only watches layer 3, and area_entered costs a heart.",
       "tree": [
         {
           "name": "Player",
           "type": "CharacterBody2D",
           "depth": 0
+        },
+        {
+          "name": "AnimatedSprite2D",
+          "depth": 1
+        },
+        {
+          "name": "CollisionShape2D",
+          "depth": 1
         },
         {
           "name": "Hurtbox",
@@ -487,19 +519,28 @@
           "depth": 2
         }
       ],
-      "bigIdea": "every-body-needs-a-shape"
+      "bigIdea": "layers-and-masks",
+      "video": "videos/e2-danger-zones.mp4",
+      "code": "func _on_hurtbox_area_entered(area: Area2D) -> void:\n    health -= 1\n    health_changed.emit(health)\n    velocity.y = -300"
     },
     {
       "id": "E3",
       "topic": "enemies",
       "title": "Chase when close",
-      "planned": true,
-      "summary": "A detection Area2D that starts a chase when the player walks in and stops it when they leave.",
+      "summary": "A DetectionArea with a big circle sets a target on body_entered and clears it on body_exited. While it has a target, the slime moves toward it.",
       "tree": [
         {
-          "name": "Enemy",
+          "name": "Slime",
           "type": "CharacterBody2D",
           "depth": 0
+        },
+        {
+          "name": "AnimatedSprite2D",
+          "depth": 1
+        },
+        {
+          "name": "CollisionShape2D",
+          "depth": 1
         },
         {
           "name": "DetectionArea",
@@ -511,7 +552,9 @@
           "depth": 2
         }
       ],
-      "bigIdea": "pick-the-body"
+      "bigIdea": "items-handle-themselves",
+      "video": "videos/e3-chase-when-close.mp4",
+      "code": "if target:\n    var player_pos := target.global_position\n    velocity = global_position.direction_to(player_pos) * SPEED\nelse:\n    velocity = Vector2.ZERO\nmove_and_slide()"
     },
     {
       "id": "T1",

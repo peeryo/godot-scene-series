@@ -24,6 +24,9 @@ Export each animation as an MP4 (the **Export** button on its page) and save it 
 | K1 A coin that collects itself | `videos/k1-coin.mp4` |
 | K2 Hearts and signals | `videos/k2-hearts-and-signals.mp4` |
 | K3 Magnet pickups | `videos/k3-magnet.mp4` |
+| E1 A patrolling slime | `videos/e1-patrolling-slime.mp4` |
+| E2 Danger zones and hurtboxes | `videos/e2-danger-zones.mp4` |
+| E3 Chase when close | `videos/e3-chase-when-close.mp4` |
 
 Until a file is there, its card says "Video not uploaded yet."
 
@@ -50,6 +53,7 @@ Then open http://localhost:8000.
 Each topic tab has a Downloads area. The files live in `downloads/`:
 - `godot-scene-series-starter.zip`: the Players starter project
 - `godot-pickups-starter.zip`: the Pickups starter project
+- `godot-enemies-starter.zip`: the Enemies starter project
 - `godot-scene-series-art.zip`: the 16 x 16 art pack
 
 When a starter changes, upload the new zip into `downloads/` with the same name.
