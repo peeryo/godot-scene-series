@@ -1,4 +1,8 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Godot Scene Series</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Short animations that show how to build each piece of a 2D game in Godot, one scene tree at a time.">
@@ -70,6 +74,17 @@ nav a:focus-visible, .chip:focus-visible, .idea-link:focus-visible { outline: 3p
 .intro { display: flex; flex-direction: column; gap: 6px; }
 .intro h2 { margin: 0; font: 700 clamp(26px, 3.2vw, 34px)/1.15 var(--display); text-wrap: balance; }
 .intro p { margin: 0; color: var(--muted); max-width: 65ch; }
+.downloads { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+.downloads h3 { margin: 0; font: 600 13px/1 var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+.dl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 12px; }
+.dl-card { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px; border-radius: 14px; background: var(--surface); border: 1px solid var(--rule); min-width: 0; }
+.dl-card .dl-top { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.dl-card b { font: 700 18px/1.25 var(--display); }
+.dl-card small { font: 500 12px/1 var(--mono); color: var(--muted); padding: 4px 8px; border-radius: 999px; border: 1px solid var(--rule); }
+.dl-card p { margin: 0; color: var(--muted); font-size: 15px; }
+.dl-card a { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); text-decoration: none; font: 600 14px/1 var(--text); }
+.dl-card a:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.dl-none { margin: 0; padding: 14px 16px; border-radius: 14px; border: 1px dashed var(--rule); color: var(--muted); font-size: 15px; }
 
 /* episode grid */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 470px), 1fr)); gap: 22px; }
@@ -116,7 +131,8 @@ pre { margin: 0; padding: 12px 14px; border-radius: 12px; background: var(--bg-2
 footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--rule); padding-top: 18px; }
 .err { background: var(--surface); padding: 18px 20px; border-radius: 14px; border-left: 4px solid var(--accent); }
 </style>
-
+</head>
+<body>
 <div class="wrap">
   <header class="top">
     <div class="mark" aria-hidden="true">
@@ -179,11 +195,30 @@ footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--rule)
       '</div></article>';
   }
 
+  // Each series has its own colors. A topic's theme overrides the color tokens while it's showing.
+  function applyTheme(theme) {
+    var el = document.getElementById('topic-theme');
+    if (!el) { el = document.createElement('style'); el.id = 'topic-theme'; document.head.appendChild(el); }
+    if (!theme) { el.textContent = ''; return; }
+    function vars(o) { return Object.keys(o).map(function (k) { return k + ':' + o[k]; }).join(';'); }
+    el.textContent = ':root{' + vars(theme.dark) + '}' +
+      '@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){' + vars(theme.light) + '}}' +
+      ':root[data-theme="light"]{' + vars(theme.light) + '}';
+  }
+
   function showTopic(id) {
     var t = DATA.topics.filter(function (x) { return x.id === id; })[0] || DATA.topics[0];
+    applyTheme(t.theme);
     var eps = DATA.episodes.filter(function (e) { return e.topic === t.id; });
     eps.sort(function (a, b) { return (b.watchFirst ? 1 : 0) - (a.watchFirst ? 1 : 0); });
-    view.innerHTML = '<section class="intro"><h2>' + esc(t.title) + '</h2><p>' + esc(t.blurb) + '</p></section><div class="grid" style="margin-top:22px">' + eps.map(cardHtml).join('') + '</div>';
+    var list = t.downloads || [];
+    var dl = '<section class="downloads" aria-label="Downloads"><h3>Downloads</h3>' + (list.length ?
+      '<div class="dl-grid">' + list.map(function (f) {
+        return '<div class="dl-card"><div class="dl-top"><b>' + esc(f.label) + '</b>' + (f.kind ? '<small>' + esc(f.kind) + '</small>' : '') + '</div>' +
+          (f.note ? '<p>' + esc(f.note) + '</p>' : '') + '<a href="' + esc(f.file) + '" download>Download</a></div>';
+      }).join('') + '</div>' :
+      '<p class="dl-none">The starter project for this series arrives with its first episode.</p>') + '</section>';
+    view.innerHTML = '<section class="intro"><h2>' + esc(t.title) + '</h2><p>' + esc(t.blurb) + '</p>' + dl + '</section><div class="grid" style="margin-top:22px">' + eps.map(cardHtml).join('') + '</div>';
     renderTabs(t.id);
     view.querySelectorAll('video').forEach(function (v) {
       v.addEventListener('error', function () { v.hidden = true; v.nextElementSibling.hidden = false; });
@@ -194,6 +229,7 @@ footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--rule)
   }
 
   function showIdeas() {
+    applyTheme(null);
     view.innerHTML = '<section class="intro"><h2>Big ideas</h2><p>The rules that come back in every episode. If a scene tree ever looks confusing, check these first.</p></section>' +
       '<div class="ideas" style="margin-top:22px">' + DATA.bigIdeas.map(function (b) {
         var chips = (b.episodes || []).map(function (id) {
@@ -232,5 +268,5 @@ footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--rule)
     });
 })();
 </script>
-
-</body></html>
+</body>
+</html>

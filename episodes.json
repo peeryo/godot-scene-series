@@ -7,27 +7,154 @@
     {
       "id": "players",
       "title": "Players",
-      "blurb": "Five ways to set up a player scene, and how to pick the right body for your game."
+      "blurb": "Five ways to set up a player scene, and how to pick the right body for your game.",
+      "downloads": [
+        {
+          "label": "Players starter project",
+          "file": "downloads/godot-scene-series-starter.zip",
+          "kind": "Godot 4.6",
+          "note": "Every level is ready. Build each player scene along with its video."
+        },
+        {
+          "label": "Art pack",
+          "file": "downloads/godot-scene-series-art.zip",
+          "kind": "PNG files",
+          "note": "Every sprite and tile as a 16 x 16 PNG, for drawing your own replacements."
+        }
+      ]
     },
     {
       "id": "pickups",
       "title": "Pickups",
-      "blurb": "Coins, hearts and keys: items that notice the player and handle themselves."
+      "blurb": "Coins, hearts and keys: items that notice the player and handle themselves.",
+      "theme": {
+        "dark": {
+          "--bg": "#2A1B3D",
+          "--bg-2": "#33234A",
+          "--surface": "#3B2A52",
+          "--surface-2": "#46335F",
+          "--ink": "#F6EEDC",
+          "--muted": "#C9BCD6",
+          "--leaf": "#6FD3C1",
+          "--accent": "#E8B04A",
+          "--accent-ink": "#2A1B3D"
+        },
+        "light": {
+          "--bg": "#F5F0E6",
+          "--bg-2": "#EEE5D6",
+          "--surface": "#FFFFFF",
+          "--surface-2": "#F7F1E7",
+          "--ink": "#2A1B3D",
+          "--muted": "#5E5170",
+          "--leaf": "#1E8C7E",
+          "--accent": "#9A6B10",
+          "--accent-ink": "#FFFFFF"
+        }
+      },
+      "downloads": [
+        {
+          "label": "Pickups starter project",
+          "file": "downloads/godot-pickups-starter.zip",
+          "kind": "Godot 4.6",
+          "note": "The player is finished. Build the coin, the heart and HUD, and the magnet."
+        },
+        {
+          "label": "Art pack",
+          "file": "downloads/godot-scene-series-art.zip",
+          "kind": "PNG files",
+          "note": "Every sprite and tile as a 16 x 16 PNG, for drawing your own replacements."
+        }
+      ]
     },
     {
       "id": "enemies",
       "title": "Enemies",
-      "blurb": "Things that move on their own, patrol, chase, and hurt the player."
+      "blurb": "Things that move on their own, patrol, chase, and hurt the player.",
+      "theme": {
+        "dark": {
+          "--bg": "#1B2433",
+          "--bg-2": "#212C3E",
+          "--surface": "#27344A",
+          "--surface-2": "#2F3D56",
+          "--ink": "#EDEFF5",
+          "--muted": "#B3BCCD",
+          "--leaf": "#8FD0E8",
+          "--accent": "#E86F5A",
+          "--accent-ink": "#1B2433"
+        },
+        "light": {
+          "--bg": "#EEF1F6",
+          "--bg-2": "#E2E7EF",
+          "--surface": "#FFFFFF",
+          "--surface-2": "#F4F6FA",
+          "--ink": "#1B2433",
+          "--muted": "#55617A",
+          "--leaf": "#2C7FA0",
+          "--accent": "#B8442F",
+          "--accent-ink": "#FFFFFF"
+        }
+      },
+      "downloads": []
     },
     {
       "id": "tilemaps",
       "title": "Tilemaps",
-      "blurb": "Painting levels from tiles, with collision built right into the tiles."
+      "blurb": "Painting levels from tiles, with collision built right into the tiles.",
+      "theme": {
+        "dark": {
+          "--bg": "#12343B",
+          "--bg-2": "#163D45",
+          "--surface": "#1B4750",
+          "--surface-2": "#22535D",
+          "--ink": "#F1F5EF",
+          "--muted": "#B2C9C6",
+          "--leaf": "#6FB7A8",
+          "--accent": "#E3C77A",
+          "--accent-ink": "#12343B"
+        },
+        "light": {
+          "--bg": "#EEF4F1",
+          "--bg-2": "#E1ECE8",
+          "--surface": "#FFFFFF",
+          "--surface-2": "#F3F8F6",
+          "--ink": "#12343B",
+          "--muted": "#4B6A6E",
+          "--leaf": "#2F7F70",
+          "--accent": "#8A6A12",
+          "--accent-ink": "#FFFFFF"
+        }
+      },
+      "downloads": []
     },
     {
       "id": "ui",
       "title": "UI",
-      "blurb": "Scores, health bars and menus that sit on top of the game."
+      "blurb": "Scores, health bars and menus that sit on top of the game.",
+      "theme": {
+        "dark": {
+          "--bg": "#161B33",
+          "--bg-2": "#1C2240",
+          "--surface": "#222A4C",
+          "--surface-2": "#2A335A",
+          "--ink": "#EEF1FA",
+          "--muted": "#B5BCD8",
+          "--leaf": "#6EA8FE",
+          "--accent": "#FF8FB1",
+          "--accent-ink": "#161B33"
+        },
+        "light": {
+          "--bg": "#EFF1FA",
+          "--bg-2": "#E3E7F5",
+          "--surface": "#FFFFFF",
+          "--surface-2": "#F5F7FD",
+          "--ink": "#161B33",
+          "--muted": "#525A7C",
+          "--leaf": "#2F6FD8",
+          "--accent": "#C2366A",
+          "--accent-ink": "#FFFFFF"
+        }
+      },
+      "downloads": []
     }
   ],
   "bigIdeas": [
@@ -48,7 +175,8 @@
       "text": "Area2D, CharacterBody2D and RigidBody2D have no size of their own. A CollisionShape2D child gives them one. A detection only happens when two shapes overlap, so both sides need a shape. Godot shows a warning triangle until you add one.",
       "episodes": [
         "P1",
-        "P2"
+        "P2",
+        "K1"
       ]
     },
     {
@@ -56,7 +184,17 @@
       "title": "Items handle themselves",
       "text": "A coin is its own scene with its own Area2D. It notices the player with body_entered and removes itself with queue_free(). Give the player its own Area2D only for the exceptions: a magnet radius, an interaction range, or a hurtbox.",
       "episodes": [
+        "K1",
+        "K3",
         "P2"
+      ]
+    },
+    {
+      "id": "calls-and-signals",
+      "title": "Call it, or signal it",
+      "text": "When one scene needs another to do something, it calls a function on it, like the heart calling heal(). When a scene has news and doesn\u2019t care who hears it, it emits a signal, like the player\u2019s health_changed. Whoever cares, like the HUD, connects to it. Each scene only knows its own job.",
+      "episodes": [
+        "K2"
       ]
     },
     {
@@ -223,8 +361,7 @@
       "id": "K1",
       "topic": "pickups",
       "title": "A coin that collects itself",
-      "planned": true,
-      "summary": "Coin.tscn: an Area2D that notices the player with body_entered, adds to the score, and removes itself.",
+      "summary": "Coin.tscn is its own scene: an Area2D that notices the player with body_entered, checks its group, and removes itself.",
       "tree": [
         {
           "name": "Coin",
@@ -240,14 +377,15 @@
           "depth": 1
         }
       ],
-      "bigIdea": "items-handle-themselves"
+      "bigIdea": "items-handle-themselves",
+      "video": "videos/k1-coin.mp4",
+      "code": "func _on_body_entered(body: Node2D) -> void:\n    if body.is_in_group(\"player\"):\n        queue_free()"
     },
     {
       "id": "K2",
       "topic": "pickups",
       "title": "Hearts and signals",
-      "planned": true,
-      "summary": "A heart pickup that heals, and a signal that tells the rest of the game it happened.",
+      "summary": "The heart calls heal() on the player. The player emits its own health_changed signal. The HUD listens and fills its hearts.",
       "tree": [
         {
           "name": "Heart",
@@ -263,19 +401,28 @@
           "depth": 1
         }
       ],
-      "bigIdea": "items-handle-themselves"
+      "bigIdea": "calls-and-signals",
+      "video": "videos/k2-hearts-and-signals.mp4",
+      "code": "signal health_changed(new_health: int)\nvar health := 1\n\nfunc heal(amount: int) -> void:\n    health += amount\n    health_changed.emit(health)"
     },
     {
       "id": "K3",
       "topic": "pickups",
       "title": "Magnet pickups",
-      "planned": true,
-      "summary": "The exception: a player-owned Area2D with a big radius that pulls coins in from far away.",
+      "summary": "The exception: the player owns a MagnetArea with a big circle. Coins that enter it slide toward the player, then still collect themselves.",
       "tree": [
         {
           "name": "Player",
           "type": "CharacterBody2D",
           "depth": 0
+        },
+        {
+          "name": "AnimatedSprite2D",
+          "depth": 1
+        },
+        {
+          "name": "CollisionShape2D",
+          "depth": 1
         },
         {
           "name": "MagnetArea",
@@ -287,7 +434,9 @@
           "depth": 2
         }
       ],
-      "bigIdea": "items-handle-themselves"
+      "bigIdea": "items-handle-themselves",
+      "video": "videos/k3-magnet.mp4",
+      "code": "func _on_magnet_area_area_entered(area: Area2D) -> void:\n    if area.is_in_group(\"coins\"):\n        area.target = self"
     },
     {
       "id": "E1",
