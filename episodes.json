@@ -1,0 +1,498 @@
+{
+  "site": {
+    "title": "Godot Scene Series",
+    "tagline": "Short animations that show how to build each piece of a 2D game, one scene tree at a time."
+  },
+  "topics": [
+    {
+      "id": "players",
+      "title": "Players",
+      "blurb": "Five ways to set up a player scene, and how to pick the right body for your game."
+    },
+    {
+      "id": "pickups",
+      "title": "Pickups",
+      "blurb": "Coins, hearts and keys: items that notice the player and handle themselves."
+    },
+    {
+      "id": "enemies",
+      "title": "Enemies",
+      "blurb": "Things that move on their own, patrol, chase, and hurt the player."
+    },
+    {
+      "id": "tilemaps",
+      "title": "Tilemaps",
+      "blurb": "Painting levels from tiles, with collision built right into the tiles."
+    },
+    {
+      "id": "ui",
+      "title": "UI",
+      "blurb": "Scores, health bars and menus that sit on top of the game."
+    }
+  ],
+  "bigIdeas": [
+    {
+      "id": "pick-the-body",
+      "title": "Pick the body by what it needs",
+      "text": "Area2D notices overlaps but never blocks. CharacterBody2D moves the way your code says and stops at walls. RigidBody2D lets the physics engine move it. When in doubt, a player starts as a CharacterBody2D.",
+      "episodes": [
+        "P5",
+        "P1",
+        "P3",
+        "P4"
+      ]
+    },
+    {
+      "id": "every-body-needs-a-shape",
+      "title": "Every body needs a shape",
+      "text": "Area2D, CharacterBody2D and RigidBody2D have no size of their own. A CollisionShape2D child gives them one. A detection only happens when two shapes overlap, so both sides need a shape. Godot shows a warning triangle until you add one.",
+      "episodes": [
+        "P1",
+        "P2"
+      ]
+    },
+    {
+      "id": "items-handle-themselves",
+      "title": "Items handle themselves",
+      "text": "A coin is its own scene with its own Area2D. It notices the player with body_entered and removes itself with queue_free(). Give the player its own Area2D only for the exceptions: a magnet radius, an interaction range, or a hurtbox.",
+      "episodes": [
+        "P2"
+      ]
+    },
+    {
+      "id": "shape-at-the-feet",
+      "title": "Top-down: the shape goes at the feet",
+      "text": "In a top-down game, keep the player's collision shape small and at the feet. The head and body can then pass in front of walls and trees, which makes the 3/4 view look right.",
+      "episodes": [
+        "P2"
+      ]
+    },
+    {
+      "id": "one-input-map",
+      "title": "One Input Map, same names everywhere",
+      "text": "Make the actions move_left, move_right, move_up, move_down and jump once in Project Settings, Input Map. Input.get_vector() turns the four moves into one direction, and moving diagonally isn't faster. Input.get_axis() does the same for one axis.",
+      "episodes": [
+        "P2",
+        "P3",
+        "P4"
+      ]
+    },
+    {
+      "id": "physics-process",
+      "title": "Move bodies in _physics_process()",
+      "text": "Code that moves a CharacterBody2D or pushes a RigidBody2D goes in _physics_process(delta), so it runs in step with the physics engine.",
+      "episodes": [
+        "P1",
+        "P2",
+        "P4"
+      ]
+    }
+  ],
+  "episodes": [
+    {
+      "id": "P1",
+      "topic": "players",
+      "title": "Platformer player",
+      "video": "videos/p1-platformer-player.mp4",
+      "summary": "A side-view player that runs, jumps and lands on the ground.",
+      "tree": [
+        {
+          "name": "Player",
+          "type": "CharacterBody2D",
+          "depth": 0
+        },
+        {
+          "name": "AnimatedSprite2D",
+          "depth": 1
+        },
+        {
+          "name": "CollisionShape2D",
+          "depth": 1
+        },
+        {
+          "name": "Camera2D",
+          "depth": 1
+        }
+      ],
+      "bigIdea": "every-body-needs-a-shape",
+      "code": "var dir = Input.get_axis(\"move_left\", \"move_right\")\nvelocity.x = dir * SPEED\nmove_and_slide()"
+    },
+    {
+      "id": "P2",
+      "topic": "players",
+      "title": "Top-down player",
+      "video": "videos/p2-topdown-player.mp4",
+      "summary": "A player that walks four ways, stops at walls, and lets coins handle themselves.",
+      "tree": [
+        {
+          "name": "Player",
+          "type": "CharacterBody2D",
+          "depth": 0
+        },
+        {
+          "name": "AnimatedSprite2D",
+          "depth": 1
+        },
+        {
+          "name": "CollisionShape2D",
+          "depth": 1
+        },
+        {
+          "name": "Camera2D",
+          "depth": 1
+        }
+      ],
+      "bigIdea": "shape-at-the-feet",
+      "code": "var dir = Input.get_vector(\n    \"move_left\", \"move_right\",\n    \"move_up\", \"move_down\")\nvelocity = dir * SPEED\nmove_and_slide()"
+    },
+    {
+      "id": "P3",
+      "topic": "players",
+      "title": "Arcade dodger player",
+      "video": "videos/p3-arcade-dodger-player.mp4",
+      "summary": "An Area2D player that moves by position, stays on screen, and notices when it gets hit.",
+      "tree": [
+        {
+          "name": "Player",
+          "type": "Area2D",
+          "depth": 0
+        },
+        {
+          "name": "AnimatedSprite2D",
+          "depth": 1
+        },
+        {
+          "name": "CollisionShape2D",
+          "depth": 1
+        }
+      ],
+      "bigIdea": "pick-the-body",
+      "code": "position += dir * SPEED * delta\nposition = position.clamp(\n    Vector2.ZERO, screen_size)"
+    },
+    {
+      "id": "P4",
+      "topic": "players",
+      "title": "Physics player",
+      "video": "videos/p4-physics-player.mp4",
+      "summary": "A rolling ball you push with forces; gravity, bounces and momentum come from the engine.",
+      "tree": [
+        {
+          "name": "Player",
+          "type": "RigidBody2D",
+          "depth": 0
+        },
+        {
+          "name": "Sprite2D",
+          "depth": 1
+        },
+        {
+          "name": "CollisionShape2D",
+          "depth": 1
+        }
+      ],
+      "bigIdea": "pick-the-body",
+      "code": "var dir = Input.get_axis(\"move_left\", \"move_right\")\napply_central_force(Vector2(dir * FORCE, 0))"
+    },
+    {
+      "id": "P5",
+      "topic": "players",
+      "title": "Which body should my player be?",
+      "video": "videos/p5-which-body.mp4",
+      "summary": "Area2D, CharacterBody2D and RigidBody2D walk at the same wall. One walks through, one stops, one bounces.",
+      "tree": [
+        {
+          "name": "Area2D",
+          "type": "notices overlaps",
+          "depth": 0
+        },
+        {
+          "name": "CharacterBody2D",
+          "type": "stops at walls",
+          "depth": 0
+        },
+        {
+          "name": "RigidBody2D",
+          "type": "physics moves it",
+          "depth": 0
+        }
+      ],
+      "bigIdea": "pick-the-body",
+      "watchFirst": true
+    },
+    {
+      "id": "K1",
+      "topic": "pickups",
+      "title": "A coin that collects itself",
+      "planned": true,
+      "summary": "Coin.tscn: an Area2D that notices the player with body_entered, adds to the score, and removes itself.",
+      "tree": [
+        {
+          "name": "Coin",
+          "type": "Area2D",
+          "depth": 0
+        },
+        {
+          "name": "AnimatedSprite2D",
+          "depth": 1
+        },
+        {
+          "name": "CollisionShape2D",
+          "depth": 1
+        }
+      ],
+      "bigIdea": "items-handle-themselves"
+    },
+    {
+      "id": "K2",
+      "topic": "pickups",
+      "title": "Hearts and signals",
+      "planned": true,
+      "summary": "A heart pickup that heals, and a signal that tells the rest of the game it happened.",
+      "tree": [
+        {
+          "name": "Heart",
+          "type": "Area2D",
+          "depth": 0
+        },
+        {
+          "name": "Sprite2D",
+          "depth": 1
+        },
+        {
+          "name": "CollisionShape2D",
+          "depth": 1
+        }
+      ],
+      "bigIdea": "items-handle-themselves"
+    },
+    {
+      "id": "K3",
+      "topic": "pickups",
+      "title": "Magnet pickups",
+      "planned": true,
+      "summary": "The exception: a player-owned Area2D with a big radius that pulls coins in from far away.",
+      "tree": [
+        {
+          "name": "Player",
+          "type": "CharacterBody2D",
+          "depth": 0
+        },
+        {
+          "name": "MagnetArea",
+          "type": "Area2D",
+          "depth": 1
+        },
+        {
+          "name": "CollisionShape2D",
+          "depth": 2
+        }
+      ],
+      "bigIdea": "items-handle-themselves"
+    },
+    {
+      "id": "E1",
+      "topic": "enemies",
+      "title": "A patrolling slime",
+      "planned": true,
+      "summary": "A CharacterBody2D enemy that walks back and forth and turns around at ledges with a RayCast2D.",
+      "tree": [
+        {
+          "name": "Slime",
+          "type": "CharacterBody2D",
+          "depth": 0
+        },
+        {
+          "name": "AnimatedSprite2D",
+          "depth": 1
+        },
+        {
+          "name": "CollisionShape2D",
+          "depth": 1
+        },
+        {
+          "name": "RayCast2D",
+          "depth": 1
+        }
+      ],
+      "bigIdea": "pick-the-body"
+    },
+    {
+      "id": "E2",
+      "topic": "enemies",
+      "title": "Hitboxes and hurtboxes",
+      "planned": true,
+      "summary": "Two Area2Ds that find each other, kept apart from walls with collision layers and masks.",
+      "tree": [
+        {
+          "name": "Player",
+          "type": "CharacterBody2D",
+          "depth": 0
+        },
+        {
+          "name": "Hurtbox",
+          "type": "Area2D",
+          "depth": 1
+        },
+        {
+          "name": "CollisionShape2D",
+          "depth": 2
+        }
+      ],
+      "bigIdea": "every-body-needs-a-shape"
+    },
+    {
+      "id": "E3",
+      "topic": "enemies",
+      "title": "Chase when close",
+      "planned": true,
+      "summary": "A detection Area2D that starts a chase when the player walks in and stops it when they leave.",
+      "tree": [
+        {
+          "name": "Enemy",
+          "type": "CharacterBody2D",
+          "depth": 0
+        },
+        {
+          "name": "DetectionArea",
+          "type": "Area2D",
+          "depth": 1
+        },
+        {
+          "name": "CollisionShape2D",
+          "depth": 2
+        }
+      ],
+      "bigIdea": "pick-the-body"
+    },
+    {
+      "id": "T1",
+      "topic": "tilemaps",
+      "title": "TileMapLayer basics",
+      "planned": true,
+      "summary": "Make a TileSet from a tile sheet and paint a level with a TileMapLayer.",
+      "tree": [
+        {
+          "name": "Level",
+          "type": "Node2D",
+          "depth": 0
+        },
+        {
+          "name": "Ground",
+          "type": "TileMapLayer",
+          "depth": 1
+        }
+      ]
+    },
+    {
+      "id": "T2",
+      "topic": "tilemaps",
+      "title": "Collision in the tiles",
+      "planned": true,
+      "summary": "Add a physics layer to the TileSet and draw collision onto tiles, so painted walls block the player.",
+      "tree": [
+        {
+          "name": "Level",
+          "type": "Node2D",
+          "depth": 0
+        },
+        {
+          "name": "Walls",
+          "type": "TileMapLayer",
+          "depth": 1
+        }
+      ],
+      "bigIdea": "every-body-needs-a-shape"
+    },
+    {
+      "id": "T3",
+      "topic": "tilemaps",
+      "title": "Y-sort for top-down",
+      "planned": true,
+      "summary": "Let the player walk behind trees and in front of them, sorted by how far down the screen they are.",
+      "tree": [
+        {
+          "name": "World",
+          "type": "Node2D (Y Sort)",
+          "depth": 0
+        },
+        {
+          "name": "Trees",
+          "type": "TileMapLayer",
+          "depth": 1
+        },
+        {
+          "name": "Player",
+          "type": "CharacterBody2D",
+          "depth": 1
+        }
+      ],
+      "bigIdea": "shape-at-the-feet"
+    },
+    {
+      "id": "U1",
+      "topic": "ui",
+      "title": "A score on screen",
+      "planned": true,
+      "summary": "A CanvasLayer HUD with a Label that stays put while the camera moves.",
+      "tree": [
+        {
+          "name": "HUD",
+          "type": "CanvasLayer",
+          "depth": 0
+        },
+        {
+          "name": "ScoreLabel",
+          "type": "Label",
+          "depth": 1
+        }
+      ]
+    },
+    {
+      "id": "U2",
+      "topic": "ui",
+      "title": "A health bar",
+      "planned": true,
+      "summary": "A TextureProgressBar that updates when the player's health changes, wired up with a signal.",
+      "tree": [
+        {
+          "name": "HUD",
+          "type": "CanvasLayer",
+          "depth": 0
+        },
+        {
+          "name": "HealthBar",
+          "type": "TextureProgressBar",
+          "depth": 1
+        }
+      ]
+    },
+    {
+      "id": "U3",
+      "topic": "ui",
+      "title": "Pause and game over",
+      "planned": true,
+      "summary": "Menus that pause the game tree and buttons that restart or quit.",
+      "tree": [
+        {
+          "name": "PauseMenu",
+          "type": "CanvasLayer",
+          "depth": 0
+        },
+        {
+          "name": "Panel",
+          "depth": 1
+        },
+        {
+          "name": "ResumeButton",
+          "type": "Button",
+          "depth": 2
+        },
+        {
+          "name": "QuitButton",
+          "type": "Button",
+          "depth": 2
+        }
+      ]
+    }
+  ]
+}

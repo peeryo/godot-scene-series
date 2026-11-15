@@ -1,0 +1,236 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Godot Scene Series</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Short animations that show how to build each piece of a 2D game in Godot, one scene tree at a time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: a scene-tree panel look. Topic tabs on top, episode cards in a 2-up grid, each card a video over its node tree. */
+:root {
+  --bg: #173A2E; --bg-2: #1D4436; --surface: #21493B; --surface-2: #2A5545;
+  --ink: #EAF5E4; --muted: #A9C4B3; --rule: rgba(234, 245, 228, .14);
+  --leaf: #7CC47F; --accent: #F4D35E; --accent-ink: #173A2E;
+  --shadow: 0 18px 44px rgba(0, 0, 0, .28);
+  --display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --text: "Inter", "Segoe UI", system-ui, sans-serif;
+  --mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #EEF4EA; --bg-2: #E3ECDE; --surface: #FFFFFF; --surface-2: #F3F7F0;
+    --ink: #173A2E; --muted: #4F6C5E; --rule: rgba(23, 58, 46, .14);
+    --leaf: #2E7D45; --accent: #8F6B00; --accent-ink: #FFFFFF;
+    --shadow: 0 14px 34px rgba(23, 58, 46, .12);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #EEF4EA; --bg-2: #E3ECDE; --surface: #FFFFFF; --surface-2: #F3F7F0;
+  --ink: #173A2E; --muted: #4F6C5E; --rule: rgba(23, 58, 46, .14);
+  --leaf: #2E7D45; --accent: #8F6B00; --accent-ink: #FFFFFF;
+  --shadow: 0 14px 34px rgba(23, 58, 46, .12);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 400 17px/1.6 var(--text);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 40px 64px; display: flex; flex-direction: column; gap: 32px; }
+
+/* header */
+.top { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+.mark { width: 56px; height: 56px; flex: none; border-radius: 14px; background: var(--surface); display: grid; place-items: center; box-shadow: var(--shadow); }
+.mark svg { width: 34px; height: 34px; }
+.top h1 { margin: 0; font: 700 clamp(30px, 4.4vw, 46px)/1.05 var(--display); letter-spacing: -.01em; text-wrap: balance; }
+.top p { margin: 4px 0 0; color: var(--muted); max-width: 62ch; }
+
+/* tabs */
+nav { display: flex; gap: 8px; flex-wrap: wrap; }
+nav a {
+  display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 999px;
+  text-decoration: none; color: var(--ink); background: var(--surface); border: 1px solid var(--rule);
+  font: 500 15px/1 var(--text);
+}
+nav a small { font: 400 12px/1 var(--mono); color: var(--muted); letter-spacing: .02em; }
+nav a:hover { border-color: var(--leaf); }
+nav a[aria-current="page"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+nav a[aria-current="page"] small { color: var(--accent-ink); opacity: .8; }
+nav a:focus-visible, .chip:focus-visible, .idea-link:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* topic intro */
+.intro { display: flex; flex-direction: column; gap: 6px; }
+.intro h2 { margin: 0; font: 700 clamp(26px, 3.2vw, 34px)/1.15 var(--display); text-wrap: balance; }
+.intro p { margin: 0; color: var(--muted); max-width: 65ch; }
+
+/* episode grid */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 470px), 1fr)); gap: 22px; }
+.ep { background: var(--surface); border-radius: 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; min-width: 0; }
+.ep-head { display: flex; align-items: baseline; gap: 12px; padding: 18px 20px 12px; flex-wrap: wrap; }
+.ep-id { font: 500 14px/1 var(--mono); color: var(--accent); letter-spacing: .04em; }
+.ep-head h3 { margin: 0; font: 700 22px/1.2 var(--display); flex: 1 1 200px; min-width: 0; }
+.tag { font: 500 12px/1 var(--mono); padding: 6px 9px; border-radius: 999px; background: var(--surface-2); color: var(--muted); border: 1px solid var(--rule); white-space: nowrap; }
+.tag.first { background: var(--leaf); color: var(--accent-ink); border-color: var(--leaf); }
+.screen { position: relative; aspect-ratio: 16 / 9; max-width: 100%; background: var(--bg-2); margin: 0 20px; border-radius: 12px; overflow: hidden; }
+.screen video { display: block; width: 100%; height: 100%; object-fit: contain; background: #0f281f; }
+.placeholder { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 16px; color: var(--muted); font: 500 15px/1.4 var(--mono);
+  background-image: linear-gradient(var(--rule) 1px, transparent 1px), linear-gradient(90deg, var(--rule) 1px, transparent 1px); background-size: 32px 32px; }
+.placeholder strong { display: block; color: var(--ink); font: 700 18px/1.3 var(--display); margin-bottom: 4px; }
+.ep-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.ep-body > p { margin: 0; }
+
+/* the node tree, drawn like the editor's scene panel */
+.tree { list-style: none; margin: 0; padding: 12px 14px; border-radius: 12px; background: var(--bg-2); font: 400 15px/1.3 var(--mono); display: flex; flex-direction: column; gap: 6px; overflow-x: auto; }
+.tree li { display: flex; align-items: center; gap: 10px; position: relative; white-space: nowrap; }
+.tree li[data-depth="1"] { padding-left: 30px; }
+.tree li[data-depth="2"] { padding-left: 60px; }
+.tree li[data-depth="1"]::before, .tree li[data-depth="2"]::before { content: ""; position: absolute; top: -10px; height: 20px; width: 14px; border-left: 2px solid var(--rule); border-bottom: 2px solid var(--rule); }
+.tree li[data-depth="1"]::before { left: 9px; }
+.tree li[data-depth="2"]::before { left: 39px; }
+.dot { width: 14px; height: 14px; border-radius: 4px; flex: none; background: var(--leaf); }
+.tree li[data-depth="0"] .dot { border-radius: 50% 50% 4px 4px; }
+.tree .type { color: var(--muted); font-size: 13px; }
+pre { margin: 0; padding: 12px 14px; border-radius: 12px; background: var(--bg-2); border: 1px solid var(--rule); overflow-x: auto; font: 400 14px/1.55 var(--mono); color: var(--ink); }
+.idea-link { display: flex; gap: 10px; align-items: flex-start; text-decoration: none; color: var(--ink); padding: 10px 12px; border-radius: 12px; border: 1px dashed var(--rule); }
+.idea-link:hover { border-color: var(--accent); }
+.idea-link b { font: 500 12px/1.6 var(--mono); color: var(--accent); text-transform: uppercase; letter-spacing: .06em; flex: none; }
+
+/* big ideas */
+.ideas { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 18px; }
+.idea { background: var(--surface); border-radius: 18px; padding: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; scroll-margin-top: 24px; }
+.idea:target { outline: 3px solid var(--accent); }
+.idea h3 { margin: 0; font: 700 21px/1.25 var(--display); text-wrap: balance; }
+.idea p { margin: 0; color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { font: 500 13px/1 var(--mono); padding: 7px 10px; border-radius: 999px; text-decoration: none; color: var(--ink); background: var(--surface-2); border: 1px solid var(--rule); }
+.chip:hover { border-color: var(--leaf); }
+
+footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--rule); padding-top: 18px; }
+.err { background: var(--surface); padding: 18px 20px; border-radius: 14px; border-left: 4px solid var(--accent); }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="mark" aria-hidden="true">
+      <svg viewBox="0 0 34 34"><rect x="4" y="3" width="12" height="9" rx="2" fill="var(--leaf)"/><rect x="18" y="14" width="12" height="8" rx="2" fill="var(--accent)"/><rect x="18" y="25" width="12" height="8" rx="2" fill="var(--ink)" opacity=".8"/><path d="M9 12v14h9M9 18h9" fill="none" stroke="var(--muted)" stroke-width="2"/></svg>
+    </div>
+    <div>
+      <h1 id="site-title">Godot Scene Series</h1>
+      <p id="site-tagline">Short animations that show how to build each piece of a 2D game, one scene tree at a time.</p>
+    </div>
+  </header>
+  <nav id="tabs" aria-label="Topics"></nav>
+  <main id="view" aria-live="polite"></main>
+  <footer>Built for Godot 4. Each video is about 30 seconds: watch it, then build the same scene tree in your own project.</footer>
+</div>
+
+<script>
+(function () {
+  var DATA = null;
+  var view = document.getElementById('view');
+  var tabs = document.getElementById('tabs');
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function ideaById(id) { return DATA.bigIdeas.filter(function (b) { return b.id === id; })[0]; }
+  function epById(id) { return DATA.episodes.filter(function (e) { return e.id === id; })[0]; }
+
+  function renderTabs(current) {
+    var html = DATA.topics.map(function (t) {
+      var eps = DATA.episodes.filter(function (e) { return e.topic === t.id; });
+      var ready = eps.filter(function (e) { return !e.planned; }).length;
+      var label = ready ? ready + (ready === 1 ? ' video' : ' videos') : 'coming soon';
+      return '<a href="#' + t.id + '"' + (current === t.id ? ' aria-current="page"' : '') + '>' + esc(t.title) + ' <small>' + label + '</small></a>';
+    }).join('');
+    html += '<a href="#big-ideas"' + (current === 'big-ideas' ? ' aria-current="page"' : '') + '>Big ideas <small>' + DATA.bigIdeas.length + '</small></a>';
+    tabs.innerHTML = html;
+  }
+
+  function treeHtml(tree) {
+    return '<ul class="tree" aria-label="Scene tree">' + tree.map(function (n) {
+      return '<li data-depth="' + (n.depth || 0) + '"><span class="dot"></span><span>' + esc(n.name) + '</span>' + (n.type ? '<span class="type">' + esc(n.type) + '</span>' : '') + '</li>';
+    }).join('') + '</ul>';
+  }
+
+  function screenHtml(e) {
+    if (e.planned || !e.video) {
+      return '<div class="screen"><div class="placeholder"><div><strong>Planned episode</strong>The animation for this one is still to come.</div></div></div>';
+    }
+    return '<div class="screen"><video controls playsinline preload="metadata" src="' + esc(e.video) + '"></video>' +
+      '<div class="placeholder" hidden><div><strong>Video not uploaded yet</strong>Add ' + esc(e.video) + ' to the repo.</div></div></div>';
+  }
+
+  function cardHtml(e) {
+    var idea = e.bigIdea ? ideaById(e.bigIdea) : null;
+    return '<article class="ep" id="ep-' + esc(e.id) + '">' +
+      '<div class="ep-head"><span class="ep-id">' + esc(e.id) + '</span><h3>' + esc(e.title) + '</h3>' +
+        (e.watchFirst ? '<span class="tag first">Watch first</span>' : '') + (e.planned ? '<span class="tag">Planned</span>' : '') + '</div>' +
+      screenHtml(e) +
+      '<div class="ep-body"><p>' + esc(e.summary) + '</p>' + treeHtml(e.tree || []) +
+        (e.code ? '<pre><code>' + esc(e.code) + '</code></pre>' : '') +
+        (idea ? '<a class="idea-link" href="#big-ideas" data-idea="' + esc(idea.id) + '"><b>Big idea</b><span>' + esc(idea.title) + '</span></a>' : '') +
+      '</div></article>';
+  }
+
+  function showTopic(id) {
+    var t = DATA.topics.filter(function (x) { return x.id === id; })[0] || DATA.topics[0];
+    var eps = DATA.episodes.filter(function (e) { return e.topic === t.id; });
+    eps.sort(function (a, b) { return (b.watchFirst ? 1 : 0) - (a.watchFirst ? 1 : 0); });
+    view.innerHTML = '<section class="intro"><h2>' + esc(t.title) + '</h2><p>' + esc(t.blurb) + '</p></section><div class="grid" style="margin-top:22px">' + eps.map(cardHtml).join('') + '</div>';
+    renderTabs(t.id);
+    view.querySelectorAll('video').forEach(function (v) {
+      v.addEventListener('error', function () { v.hidden = true; v.nextElementSibling.hidden = false; });
+    });
+    view.querySelectorAll('.idea-link').forEach(function (a) {
+      a.addEventListener('click', function () { try { sessionStorage.setItem('idea', a.dataset.idea); } catch (err) {} });
+    });
+  }
+
+  function showIdeas() {
+    view.innerHTML = '<section class="intro"><h2>Big ideas</h2><p>The rules that come back in every episode. If a scene tree ever looks confusing, check these first.</p></section>' +
+      '<div class="ideas" style="margin-top:22px">' + DATA.bigIdeas.map(function (b) {
+        var chips = (b.episodes || []).map(function (id) {
+          var e = epById(id); if (!e) return '';
+          return '<a class="chip" href="#' + e.topic + '" data-ep="' + esc(e.id) + '">' + esc(e.id) + ' ' + esc(e.title) + '</a>';
+        }).join('');
+        return '<article class="idea" id="idea-' + esc(b.id) + '"><h3>' + esc(b.title) + '</h3><p>' + esc(b.text) + '</p>' + (chips ? '<div class="chips">' + chips + '</div>' : '') + '</article>';
+      }).join('') + '</div>';
+    renderTabs('big-ideas');
+    var want = null; try { want = sessionStorage.getItem('idea'); sessionStorage.removeItem('idea'); } catch (err) {}
+    if (want) { var el = document.getElementById('idea-' + want); if (el) { el.setAttribute('tabindex', '-1'); el.focus({ preventScroll: true }); el.scrollIntoView({ block: 'center' }); el.style.outline = '3px solid var(--accent)'; } }
+    view.querySelectorAll('.chip').forEach(function (a) {
+      a.addEventListener('click', function () { try { sessionStorage.setItem('ep', a.dataset.ep); } catch (err) {} });
+    });
+  }
+
+  function route() {
+    var h = (location.hash || '').replace('#', '') || 'players';
+    if (h === 'big-ideas') showIdeas(); else showTopic(h);
+    var ep = null; try { ep = sessionStorage.getItem('ep'); sessionStorage.removeItem('ep'); } catch (err) {}
+    if (ep) { var el = document.getElementById('ep-' + ep); if (el) el.scrollIntoView({ block: 'start' }); }
+  }
+
+  fetch('episodes.json', { cache: 'no-cache' })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (d) {
+      DATA = d;
+      document.getElementById('site-title').textContent = d.site.title;
+      document.getElementById('site-tagline').textContent = d.site.tagline;
+      document.title = d.site.title;
+      route();
+      window.addEventListener('hashchange', route);
+    })
+    .catch(function () {
+      view.innerHTML = '<div class="err">The episode list (episodes.json) didn’t load. On GitHub Pages it loads on its own. If you opened index.html straight from your computer, run a local server instead, for example <code>python3 -m http.server</code> in this folder.</div>';
+    });
+})();
+</script>
+
+</body></html>
