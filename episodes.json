@@ -115,7 +115,7 @@
         }
       ],
       "bigIdea": "every-body-needs-a-shape",
-      "code": "var dir = Input.get_axis(\"move_left\", \"move_right\")\nvelocity.x = dir * SPEED\nmove_and_slide()"
+      "code": "var dir := Input.get_axis(\"move_left\", \"move_right\")\nvelocity.x = dir * SPEED\nmove_and_slide()"
     },
     {
       "id": "P2",
@@ -143,7 +143,7 @@
         }
       ],
       "bigIdea": "shape-at-the-feet",
-      "code": "var dir = Input.get_vector(\n    \"move_left\", \"move_right\",\n    \"move_up\", \"move_down\")\nvelocity = dir * SPEED\nmove_and_slide()"
+      "code": "var dir := Input.get_vector(\n    \"move_left\", \"move_right\",\n    \"move_up\", \"move_down\")\nvelocity = dir * SPEED\nmove_and_slide()"
     },
     {
       "id": "P3",
@@ -191,7 +191,7 @@
         }
       ],
       "bigIdea": "pick-the-body",
-      "code": "var dir = Input.get_axis(\"move_left\", \"move_right\")\napply_central_force(Vector2(dir * FORCE, 0))"
+      "code": "var dir := Input.get_axis(\"move_left\", \"move_right\")\napply_central_force(Vector2(dir * FORCE, 0))"
     },
     {
       "id": "P5",
